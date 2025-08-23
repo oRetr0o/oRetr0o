@@ -1,40 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wallet Viewer</title>
+  <link rel="stylesheet" href="wallet.css" />
 </head>
 <body>
-  <h2>Wallet Viewer</h2>
-  <input type="text" id="walletInput" placeholder="Paste wallet address" />
-  <button onclick="fetchWallet()">Check Wallet</button>
-  <ul id="walletData"></ul>
-
-  <hr>
-  <a href="tokenwatch.html">Go to Token Watchlist</a>
-
-  <script>
-    async function fetchWallet() {
-      const address = document.getElementById('walletInput').value;
-      const API_KEY = 'cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT'; // Your Covalent API key
-      const chainId = 1; // Ethereum Mainnet
-      const url = `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/?key=${API_KEY}`;
-
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const tokens = data.data.items;
-
-        const list = document.getElementById('walletData');
-        list.innerHTML = '';
-        tokens.forEach(token => {
-          const li = document.createElement('li');
-          li.textContent = `${token.contract_ticker_symbol}: ${token.balance / 10 ** token.contract_decimals}`;
-          list.appendChild(li);
-        });
-      } catch (err) {
-        console.error('Error fetching wallet data:', err);
-      }
-    }
-  </script>
+  <div class="wallet-container">
+    <h2>Wallet Overview</h2>
+    <div class="wallet-card">
+      <div class="chain-badge eth">Ethereum</div>
+      <div class="wallet-info">
+        <h3>0xA1...B2C3</h3>
+        <p>Total Balance: <strong>$1,245.67</strong></p>
+        <ul class="token-list">
+          <li><img src="eth-logo.png" alt="ETH"> ETH – 0.45</li>
+          <li><img src="usdc-logo.png" alt="USDC"> USDC – 120.00</li>
+          <li><img src="link-logo.png" alt="LINK"> LINK – 15.3</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
