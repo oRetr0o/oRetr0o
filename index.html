@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RetroChain</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow-x: hidden;
+    }
+    header {
+      backdrop-filter: blur(10px);
+      background: rgba(0, 255, 153, 0.1);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 2rem;
+      border-bottom: 1px solid #00ff99;
+      box-shadow: 0 0 10px #00ff99;
+    }
+    main {
+      padding: 3rem 2rem;
+      text-align: center;
+      animation: fadeIn 1.5s ease-in;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px #00ff99;
+    }
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+    button {
+      background: linear-gradient(135deg, #00ff99, #00cc88);
+      color: #0f0f0f;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border-radius: 30px;
+      box-shadow: 0 0 15px #00ff99;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #00ff99;
+    }
+    #message {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #00ff99;
+      animation: pulse 1.5s infinite;
+    }
+    footer {
+      margin-top: 4rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #aaa;
+      padding-bottom: 2rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+  <header>🚀 RetroChain</header>
+  <main>
+    <h1>Welcome to the Future</h1>
+    <p>RetroChain is your gateway to a decentralized universe. Fast, secure, and built for visionaries like you.</p>
+    <button onclick="showMessage()">Enter the Portal</button>
+    <p id="message"></p>
+  </main>
+  <footer>&copy; 2025 RetroChain. Crafted with precision in Tehran.</footer>
+
+  <script>
+    function showMessage() {
+      document.getElementById("message").textContent = "Access granted. Welcome aboard, Commander Amir.";
+    }
+  </script>
+</body>
+</html>
