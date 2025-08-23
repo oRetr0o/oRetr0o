@@ -1,0 +1,57 @@
+body {
+  background: #0d0d0d;
+  color: #f0f0f0;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.wallet-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+  color: #00ffff;
+  margin-bottom: 20px;
+}
+
+.wallet-card {
+  background: #1a1a1a;
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 15px #00ffff55;
+  transition: transform 0.3s ease;
+}
+
+.wallet-card:hover {
+  transform: scale(1.03);
+}
+
+.chain-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.8em;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.chain-badge.eth { background: #627eea; }
+
+.token-list {
+  list-style: none;
+  padding: 0;
+}
+
+.token-list li {
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+}
+
+.token-list img {
+  width: 20px;
+  margin-right: 8px;
+}
