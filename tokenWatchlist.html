@@ -7,23 +7,32 @@
   <h2>Token Watchlist</h2>
   <ul id="tokenList"></ul>
 
+  <hr>
+  <a href="walletviewer.html">Go to Wallet Viewer</a>
+
   <script>
     const watchlist = ['bitcoin', 'ethereum', 'chainlink', 'matic-network'];
 
     async function fetchPrices() {
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${watchlist.join(',')}&vs_currencies=usd&include_24hr_change=true`;
-      const res = await fetch(url);
-      const data = await res.json();
 
-      const list = document.getElementById('tokenList');
-      list.innerHTML = '';
-      watchlist.forEach(id => {
-        const li = document.createElement('li');
-        const price = data[id]?.usd?.toFixed(2);
-        const change = data[id]?.usd_24h_change?.toFixed(2);
-        li.textContent = `${id.toUpperCase()}: $${price} (${change}%)`;
-        list.appendChild(li);
-      });
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const list = document.getElementById('tokenList');
+        list.innerHTML = '';
+
+        watchlist.forEach(id => {
+          const price = data[id]?.usd?.toFixed(2);
+          const change = data[id]?.usd_24h_change?.toFixed(2);
+          const li = document.createElement('li');
+          li.textContent = `${id.toUpperCase()}: $${price} (${change}%)`;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error('Error fetching token prices:', err);
+      }
     }
 
     fetchPrices();
