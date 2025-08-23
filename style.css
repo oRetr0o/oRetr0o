@@ -82,9 +82,18 @@ main {
   }
 }
 
-/* Lists */
+/* Lists and links */
 ul {
   padding-left: 1.2rem;
+}
+
+a {
+  color: #00f0ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 /* Footer */
@@ -99,9 +108,4 @@ footer {
 .social a {
   margin: 0 1rem;
   color: #00f0ff;
-  text-decoration: none;
-}
-
-.social a:hover {
-  text-decoration: underline;
 }
