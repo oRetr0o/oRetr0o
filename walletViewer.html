@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wallet Viewer</title>
+</head>
+<body>
+  <h2>Wallet Viewer</h2>
+  <input type="text" id="walletInput" placeholder="Paste wallet address" />
+  <button onclick="fetchWallet()">Check Wallet</button>
+  <ul id="walletData"></ul>
+
+  <script>
+    async function fetchWallet() {
+      const address = document.getElementById('walletInput').value;
+      const API_KEY = 'cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT'; // ← Get this from covalenthq.com
+      const chainId = 1; // Ethereum
+      const url = `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/?key=${API_KEY}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const tokens = data.data.items;
+
+        const list = document.getElementById('walletData');
+        list.innerHTML = '';
+        tokens.forEach(token => {
+          const li = document.createElement('li');
+          li.textContent = `${token.contract_ticker_symbol}: ${token.balance / 10 ** token.contract_decimals}`;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error('Error:', err);
+      }
+    }
+  </script>
+</body>
+</html>
