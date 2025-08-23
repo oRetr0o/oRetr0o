@@ -9,11 +9,14 @@
   <button onclick="fetchWallet()">Check Wallet</button>
   <ul id="walletData"></ul>
 
+  <hr>
+  <a href="tokenwatch.html">Go to Token Watchlist</a>
+
   <script>
     async function fetchWallet() {
       const address = document.getElementById('walletInput').value;
-      const API_KEY = 'cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT'; // ← Get this from covalenthq.com
-      const chainId = 1; // Ethereum
+      const API_KEY = 'cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT'; // Your Covalent API key
+      const chainId = 1; // Ethereum Mainnet
       const url = `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/?key=${API_KEY}`;
 
       try {
@@ -29,7 +32,7 @@
           list.appendChild(li);
         });
       } catch (err) {
-        console.error('Error:', err);
+        console.error('Error fetching wallet data:', err);
       }
     }
   </script>
