@@ -3,111 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>oRetr0o Web3 Hub</title>
+  <title>Crypto Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Orbitron', sans-serif;
-      background-color: #0d0d0d;
-      color: #e0e0e0;
-      margin: 0;
-      padding: 0;
-    }
-
-    header, footer {
-      text-align: center;
-      padding: 2rem;
-      background: linear-gradient(to right, #1f1f1f, #2c2c2c);
-      box-shadow: 0 0 10px #00ffe0;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      color: #00ffe0;
-      text-shadow: 0 0 5px #00ffe0;
-    }
-
-    .card {
-      background-color: #1a1a1a;
-      margin: 2rem auto;
-      padding: 1.5rem;
-      max-width: 700px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #00ffe0;
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover {
-      transform: scale(1.02);
-    }
-
-    a {
-      color: #00ffe0;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    a:hover {
-      text-shadow: 0 0 5px #00ffe0;
-    }
-
-    .social a {
-      margin: 0 1rem;
-    }
-  </style>
 </head>
 <body>
+  <div id="loader">
+    <div class="spinner"></div>
+  </div>
+
   <header>
-    <h1>⚡ oRetr0o Web3 Hub</h1>
-    <p>Your gateway to crypto analytics, decentralized tech, and the latest in innovation.</p>
+    <h1>💠 Crypto Dashboard</h1>
+    <p>Track your tokens, wallets, and trends—no wallet connection needed.</p>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>📈 Crypto Dashboard</h2>
-      <ul>
-        <li>Live price tracker</li>
-        <li>Mining profitability calculator</li>
-        <li>GPU hash rate comparison</li>
-      </ul>
-    </section>
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="walletviewer.html">🧮 Wallet Viewer</a>
+    <a href="tokenwatch.html">📊 Token Watchlist</a>
+  </nav>
 
-    <section class="card">
-      <h2>🧮 Wallet Viewer</h2>
-      <p>Check wallet balances without connecting your wallet. Privacy-first, fast, and intuitive.</p>
-      <a href="walletviewer.html">Launch Wallet Viewer</a>
-    </section>
+  <button class="toggle-btn" onclick="toggleMode()">🌓 Toggle Mode</button>
 
-    <section class="card">
-      <h2>📊 Token Watchlist</h2>
-      <p>Track your favorite tokens and prices in real time. No login, no hassle.</p>
-      <a href="tokenwatch.html">Open Token Watchlist</a>
-    </section>
+  <section class="card">
+    <h2>📈 Market Overview</h2>
+    <p>Real-time prices, trends, and token stats coming soon.</p>
+    <ul>
+      <li>Ethereum: $3,200</li>
+      <li>Solana: $28.50</li>
+      <li>Polygon: $0.85</li>
+    </ul>
+  </section>
 
-    <section class="card">
-      <h2>🌐 Web3 Insights</h2>
-      <p>Explore the rise of DePINs, tokenized assets, and decentralized identity. Web3 is reshaping finance, gaming, and infrastructure.</p>
-      <a href="https://cointelegraph.com/news/time-for-a-web3-reality-check-which-altcoin-sectors-are-really-delivering" target="_blank">Read the latest Web3 analysis</a>
-    </section>
-
-    <section class="card">
-      <h2>📰 Tech News</h2>
-      <ul>
-        <li><a href="https://gizmodo.com/nvidia-earnings-tech-drop-2000647269" target="_blank">Nvidia’s earnings shake up the AI sector</a></li>
-        <li><a href="https://www.scmp.com/tech/big-tech/article/3322850/tech-war-deepseeks-ue8m0-fp8-innovation-seen-boost-chinas-ai-self-sufficiency" target="_blank">China’s DeepSeek challenges Nvidia with FP8 innovation</a></li>
-        <li><a href="https://www.msn.com/en-us/money/technology/nvidias-latest-tech-will-let-companies-turn-data-centers-into-one-massive-gpu/ar-AA1L25az" target="_blank">Nvidia turns data centers into mega GPUs</a></li>
-      </ul>
-    </section>
-  </main>
+  <section class="card">
+    <h2>🧠 Smart Insights</h2>
+    <p>We’re building predictive tools to help you stay ahead of the curve.</p>
+  </section>
 
   <footer>
-    <p>&copy; 2025 oRetr0o. Built by Amir. Powered by decentralization.</p>
+    <p>Made with ⚡ by Amir</p>
     <div class="social">
-      <a href="https://github.com/oRetr0o" target="_blank">GitHub</a>
-      <a href="#">Web3 Blog</a>
-      <a href="#">Contact</a>
+      <a href="#">🐦 Twitter</a>
+      <a href="#">📬 Contact</a>
     </div>
   </footer>
+
+  <script>
+    // Dark/Light Mode Toggle
+    function toggleMode() {
+      document.body.classList.toggle('light-mode');
+    }
+
+    // Loader
+    window.addEventListener("load", () => {
+      document.getElementById("loader").style.display = "none";
+    });
+  </script>
 </body>
 </html>
