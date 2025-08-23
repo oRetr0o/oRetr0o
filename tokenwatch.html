@@ -1,41 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Token Watchlist</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Token Watch</title>
+  <link rel="stylesheet" href="tokenwatch.css" />
 </head>
 <body>
-  <h2>Token Watchlist</h2>
-  <ul id="tokenList"></ul>
-
-  <hr>
-  <a href="walletviewer.html">Go to Wallet Viewer</a>
-
-  <script>
-    const watchlist = ['bitcoin', 'ethereum', 'chainlink', 'matic-network'];
-
-    async function fetchPrices() {
-      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${watchlist.join(',')}&vs_currencies=usd&include_24hr_change=true`;
-
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-
-        const list = document.getElementById('tokenList');
-        list.innerHTML = '';
-
-        watchlist.forEach(id => {
-          const price = data[id]?.usd?.toFixed(2);
-          const change = data[id]?.usd_24h_change?.toFixed(2);
-          const li = document.createElement('li');
-          li.textContent = `${id.toUpperCase()}: $${price} (${change}%)`;
-          list.appendChild(li);
-        });
-      } catch (err) {
-        console.error('Error fetching token prices:', err);
-      }
-    }
-
-    fetchPrices();
-  </script>
+  <div class="tokenwatch-container">
+    <h2>Token Watchlist</h2>
+    <div class="token-grid">
+      <div class="token-card">
+        <img src="eth-logo.png" class="token-logo" alt="ETH">
+        <h3>ETH</h3>
+        <p>$3,245.12</p>
+        <span class="chain-badge eth">Ethereum</span>
+      </div>
+      <div class="token-card">
+        <img src="bnb-logo.png" class="token-logo" alt="BNB">
+        <h3>BNB</h3>
+        <p>$312.45</p>
+        <span class="chain-badge bnb">BNB Chain</span>
+      </div>
+      <div class="token-card">
+        <img src="matic-logo.png" class="token-logo" alt="MATIC">
+        <h3>MATIC</h3>
+        <p>$0.74</p>
+        <span class="chain-badge polygon">Polygon</span>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
