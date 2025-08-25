@@ -5,42 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ethereum Wallet Viewer</title>
   <style>
-    body {
-      background-color: #121212;
-      color: #eee;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
+    :root {
+      --bg-color: #0f0f0f;
+      --accent: #00ffe0;
+      --error: #ff4c4c;
+      --font: 'Segoe UI', sans-serif;
     }
+
+    body {
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #eee;
+      font-family: var(--font);
+      padding: 2rem;
+      animation: pulseBg 10s infinite alternate;
+    }
+
+    @keyframes pulseBg {
+      0% { background-color: #0f0f0f; }
+      100% { background-color: #1a1a1a; }
+    }
+
     h1 {
       text-align: center;
-      color: #00ffe0;
-      text-shadow: 0 0 8px #00ffe0;
+      color: var(--accent);
+      text-shadow: 0 0 12px var(--accent);
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
+
+    h1::before {
+      content: "Ξ ";
+      font-size: 2.2rem;
+      vertical-align: middle;
+    }
+
     input, button {
-      padding: 0.5rem;
+      padding: 0.6rem 1rem;
       margin: 0.5rem;
       font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #1e1e1e;
+      color: #eee;
+      box-shadow: 0 0 8px var(--accent);
+      transition: box-shadow 0.3s ease;
     }
+
+    input:focus, button:hover {
+      box-shadow: 0 0 12px var(--accent);
+      outline: none;
+    }
+
     table {
       width: 100%;
       margin-top: 1rem;
       border-collapse: collapse;
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 12px #00ffe055;
     }
+
     th, td {
-      padding: 0.75rem;
-      border-bottom: 1px solid #444;
+      padding: 1rem;
+      border-bottom: 1px solid #333;
       text-align: left;
     }
+
     th {
       background-color: #222;
+      color: var(--accent);
+      text-shadow: 0 0 6px var(--accent);
     }
+
+    tr:hover td {
+      background-color: #2a2a2a;
+      transition: background 0.3s ease;
+    }
+
     .error {
-      color: #ff6b6b;
+      color: var(--error);
+      text-align: center;
+      padding: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>🧬 Ethereum Wallet Viewer</h1>
+  <h1>Ethereum Wallet Viewer</h1>
   <input type="text" id="walletInput" placeholder="Enter Ethereum wallet address" />
   <button onclick="loadEthereum()">Check Balance</button>
   <table id="resultsTable">
