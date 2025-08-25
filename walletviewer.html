@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multi-Chain Wallet Viewer</title>
+  <title>Wallet Viewer</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       background-color: #121212;
       color: #eee;
+      font-family: 'Segoe UI', sans-serif;
       padding: 2rem;
     }
     h1 {
@@ -47,7 +47,6 @@
     <thead>
       <tr>
         <th>Chain</th>
-        <th>Symbol</th>
         <th>Balance</th>
         <th>USD Value</th>
       </tr>
@@ -98,7 +97,7 @@
       tbody.innerHTML = "";
 
       if (!wallet.startsWith("0x") || wallet.length !== 42) {
-        tbody.innerHTML = `<tr><td colspan="4" class="error">Invalid wallet address</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" class="error">Invalid wallet address</td></tr>`;
         return;
       }
 
@@ -111,7 +110,6 @@
 
           const row = `<tr>
             <td>${chain.name}</td>
-            <td>${chain.symbol}</td>
             <td>${balance.toFixed(6)}</td>
             <td>$${usdValue.toFixed(2)}</td>
           </tr>`;
@@ -119,7 +117,7 @@
         } catch (err) {
           tbody.innerHTML += `<tr>
             <td>${chain.name}</td>
-            <td colspan="3" class="error">Error: ${err.message}</td>
+            <td colspan="2" class="error">Error: ${err.message}</td>
           </tr>`;
         }
       }
