@@ -4,18 +4,67 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wallet Viewer</title>
-  <link rel="stylesheet" href="walletview.css" />
+  <style>
+    body {
+      background: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    .wallet-container {
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+    .wallet-header {
+      margin-bottom: 20px;
+    }
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+    .token-card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px #00ffcc;
+    }
+    .token-card img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="wallet-container">
-    <h1>🔍 Wallet Viewer</h1>
-    <div class="wallet-input">
-      <input type="text" id="walletAddress" placeholder="Enter wallet address" />
-      <button onclick="fetchWallet()">View Wallet</button>
+    <div class="wallet-header">
+      <h1>Wallet Overview</h1>
+      <p>Address: <strong>0x1234...abcd</strong></p>
+      <p>Total Balance: <strong>$1,245.67</strong></p>
     </div>
-    <div id="walletTokens" class="token-grid"></div>
-  </div>
 
-  <script src="walletview.js"></script>
+    <div class="token-grid">
+      <div class="token-card">
+        <img src="eth-logo.png" alt="ETH" />
+        <h3>Ethereum (ETH)</h3>
+        <p>0.45 ETH</p>
+        <p>$1,200.00</p>
+      </div>
+      <div class="token-card">
+        <img src="usdc-logo.png" alt="USDC" />
+        <h3>USD Coin (USDC)</h3>
+        <p>120.00 USDC</p>
+        <p>$120.00</p>
+      </div>
+      <div class="token-card">
+        <img src="link-logo.png" alt="LINK" />
+        <h3>Chainlink (LINK)</h3>
+        <p>15.3 LINK</p>
+        <p>$45.67</p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
