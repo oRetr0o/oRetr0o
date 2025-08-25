@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>ETH Wallet Balance Viewer</title>
+  <title>ETH Wallet Balance + USD</title>
   <style>
     body {
       background: #0d0d0d;
@@ -46,23 +46,34 @@
     async function getBalance() {
       const address = document.getElementById('wallet').value.trim();
       const apiKey = 'U5HET6R6EIMUIVEJ2KNP1M3MFZC8R8JRAQ';
-      const url = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`;
+      const balanceUrl = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`;
+      const priceUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
 
       const display = document.getElementById('balanceDisplay');
       display.innerText = 'Fetching...';
 
       try {
-        const res = await fetch(url);
-        const data = await res.json();
+        const [balanceRes, priceRes] = await Promise.all([
+          fetch(balanceUrl),
+          fetch(priceUrl)
+        ]);
 
-        if (data.status === "1") {
-          const eth = (parseFloat(data.result) / 1e18).toFixed(6);
-          display.innerHTML = `💰 Balance: <strong>${eth} ETH</strong>`;
+        const balanceData = await balanceRes.json();
+        const priceData = await priceRes.json();
+
+        if (balanceData.status === "1") {
+          const eth = parseFloat(balanceData.result) / 1e18;
+          const usdRate = priceData.ethereum.usd;
+          const usdValue = (eth * usdRate).toFixed(2);
+          display.innerHTML = `
+            💰 Balance: <strong>${eth.toFixed(6)} ETH</strong><br>
+            💵 Value: <strong>$${usdValue} USD</strong>
+          `;
         } else {
-          display.innerHTML = `<span class="error">⚠️ Error: ${data.message}</span>`;
+          display.innerHTML = `<span class="error">⚠️ Error: ${balanceData.message}</span>`;
         }
       } catch (err) {
-        display.innerHTML = `<span class="error">❌ Failed to fetch balance.</span>`;
+        display.innerHTML = `<span class="error">❌ Failed to fetch data.</span>`;
       }
     }
   </script>
