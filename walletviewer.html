@@ -2,118 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Multi-Chain Wallet Viewer</title>
   <style>
-    body {
-      background: #0d0d0d;
-      color: #ffffff;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    input, select, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: none;
-    }
-    input {
-      width: 300px;
-    }
-    button {
-      background-color: #00ffcc;
-      color: #000;
-      cursor: pointer;
-    }
-    .balance {
-      margin-top: 30px;
-      font-size: 1.4rem;
-      color: #00ffcc;
-    }
-    .error {
-      color: #ff4444;
-    }
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 2rem; }
+    input, select { padding: 0.5rem; margin-right: 1rem; }
+    .token { margin: 1rem 0; padding: 1rem; background: #222; border-radius: 8px; }
+    .token img { width: 24px; vertical-align: middle; margin-right: 8px; }
   </style>
 </head>
 <body>
-  <h1>🌐 Multi-Chain Wallet Viewer</h1>
-  <input type="text" id="wallet" placeholder="Enter wallet address (0x...)" />
+  <h1>🔍 Wallet Token Viewer</h1>
+  <input type="text" id="wallet" placeholder="Enter wallet address" />
   <select id="chain">
-    <option value="eth">Ethereum</option>
-    <option value="polygon">Polygon</option>
-    <option value="bsc">BNB Chain</option>
-    <option value="arbitrum">Arbitrum</option>
-    <option value="optimism">Optimism</option>
+    <option value="eth-mainnet">Ethereum</option>
+    <option value="matic-mainnet">Polygon</option>
+    <option value="bsc-mainnet">BNB Chain</option>
   </select>
-  <button onclick="getBalance()">Check Balance</button>
-  <div class="balance" id="balanceDisplay"></div>
+  <button onclick="fetchTokens()">Check Tokens</button>
+
+  <div id="results"></div>
 
   <script>
-    const apiKey = 'U5HET6R6EIMUIVEJ2KNP1M3MFZC8R8JRAQ';
+    const API_KEY = "cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT";
 
-    const chains = {
-      eth: {
-        name: 'Ethereum',
-        explorer: 'https://api.etherscan.io/api',
-        coingeckoId: 'ethereum'
-      },
-      polygon: {
-        name: 'Polygon',
-        explorer: 'https://api.polygonscan.com/api',
-        coingeckoId: 'polygon'
-      },
-      bsc: {
-        name: 'BNB Chain',
-        explorer: 'https://api.bscscan.com/api',
-        coingeckoId: 'binancecoin'
-      },
-      arbitrum: {
-        name: 'Arbitrum',
-        explorer: 'https://api.arbiscan.io/api',
-        coingeckoId: 'arbitrum'
-      },
-      optimism: {
-        name: 'Optimism',
-        explorer: 'https://api-optimistic.etherscan.io/api',
-        coingeckoId: 'optimism'
-      }
-    };
+    async function fetchTokens() {
+      const wallet = document.getElementById("wallet").value.trim();
+      const chain = document.getElementById("chain").value;
+      const results = document.getElementById("results");
+      results.innerHTML = "⏳ Loading...";
 
-    async function getBalance() {
-      const address = document.getElementById('wallet').value.trim();
-      const chainKey = document.getElementById('chain').value;
-      const chain = chains[chainKey];
-      const display = document.getElementById('balanceDisplay');
-      display.innerText = 'Fetching...';
-
-      const balanceUrl = `${chain.explorer}?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`;
-      const priceUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${chain.coingeckoId}&vs_currencies=usd`;
+      const url = `https://api.covalenthq.com/v1/${chain}/address/${wallet}/balances_v2/?key=${API_KEY}`;
 
       try {
-        const [balanceRes, priceRes] = await Promise.all([
-          fetch(balanceUrl),
-          fetch(priceUrl)
-        ]);
+        const res = await fetch(url);
+        const data = await res.json();
 
-        const balanceData = await balanceRes.json();
-        const priceData = await priceRes.json();
-
-        if (balanceData.status === "1") {
-          const nativeBalance = parseFloat(balanceData.result) / 1e18;
-          const usdRate = priceData[chain.coingeckoId].usd;
-          const usdValue = (nativeBalance * usdRate).toFixed(2);
-
-          display.innerHTML = `
-            🔗 <strong>${chain.name}</strong><br>
-            💰 Balance: <strong>${nativeBalance.toFixed(6)}</strong><br>
-            💵 USD Value: <strong>$${usdValue}</strong>
-          `;
-        } else {
-          display.innerHTML = `<span class="error">⚠️ ${balanceData.message}</span>`;
+        if (!data.data || !data.data.items) {
+          results.innerHTML = "❌ No data found.";
+          return;
         }
+
+        results.innerHTML = `<h2>✅ Tokens for ${wallet}</h2>`;
+        data.data.items.forEach(token => {
+          if (token.balance === "0") return;
+
+          const balance = (parseFloat(token.balance) / Math.pow(10, token.contract_decimals)).toFixed(4);
+          const logo = token.logo_url || "";
+          const name = token.contract_name || "Unknown";
+          const symbol = token.contract_ticker_symbol || "";
+
+          results.innerHTML += `
+            <div class="token">
+              ${logo ? `<img src="${logo}" alt="${symbol}" />` : ""}
+              <strong>${name} (${symbol})</strong><br/>
+              Balance: ${balance}
+            </div>
+          `;
+        });
       } catch (err) {
-        display.innerHTML = `<span class="error">❌ Failed to fetch data.</span>`;
+        results.innerHTML = "⚠️ Error fetching token data.";
+        console.error(err);
       }
     }
   </script>
