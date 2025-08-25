@@ -2,139 +2,126 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Unified Wallet Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Chain Wallet Viewer</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #0f0f0f;
+      background-color: #121212;
       color: #eee;
       padding: 2rem;
     }
     h1 {
-      color: #0ff;
-      text-shadow: 0 0 8px #0ff;
+      text-align: center;
+      color: #00ffe0;
+      text-shadow: 0 0 8px #00ffe0;
     }
     input, button {
-      padding: 0.6rem;
+      padding: 0.5rem;
       margin: 0.5rem;
-      border-radius: 6px;
-      border: none;
       font-size: 1rem;
     }
-    button {
-      background: #0ff;
-      color: #000;
-      cursor: pointer;
-      box-shadow: 0 0 10px #0ff;
+    table {
+      width: 100%;
+      margin-top: 1rem;
+      border-collapse: collapse;
     }
-    .token {
-      background: #1a1a1a;
-      margin: 1rem 0;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 6px #333;
+    th, td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #444;
+      text-align: left;
     }
-    .token img {
-      width: 28px;
-      vertical-align: middle;
-      margin-right: 10px;
+    th {
+      background-color: #222;
+    }
+    .error {
+      color: #ff6b6b;
     }
   </style>
 </head>
 <body>
-  <h1>🌐 Unified Multi-Chain Wallet Viewer</h1>
-  <input type="text" id="wallet" placeholder="Enter wallet address" />
-  <button onclick="fetchAllChains()">Show All Chains</button>
-
-  <div id="results"></div>
+  <h1>🧬 Multi-Chain Wallet Viewer</h1>
+  <input type="text" id="walletInput" placeholder="Enter wallet address" />
+  <button onclick="loadWallet()">Check Balances</button>
+  <table id="resultsTable">
+    <thead>
+      <tr>
+        <th>Chain</th>
+        <th>Symbol</th>
+        <th>Balance</th>
+        <th>USD Value</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    const COVALENT_KEY = "cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT";
-    const CMC_KEY = "5dfe48da-083d-4537-a46e-71d2d958c07d";
+    const config = {
+      COINMARKETCAP_API_KEY: "5dfe48da-083d-4537-a46e-71d2d958c07d",
+      ETHERSCAN_API_KEY: "U5HET6R6EIMUIVEJ2KNP1M3MFZC8R8JRAQ",
+    };
 
-    const chains = [
-      { slug: "eth-mainnet", platform: "ethereum" },
-      { slug: "matic-mainnet", platform: "polygon-pos" },
-      { slug: "bsc-mainnet", platform: "binance-smart-chain" },
-      { slug: "base-mainnet", platform: "base" },
-      { slug: "avalanche-mainnet", platform: "avalanche" },
-      { slug: "optimism-mainnet", platform: "optimism" },
-      { slug: "arbitrum-mainnet", platform: "arbitrum-one" }
-    ];
+    const chains = {
+      ethereum: { name: "Ethereum", explorer: "https://api.etherscan.io", symbol: "ETH" },
+      bsc: { name: "BNB Chain", explorer: "https://api.bscscan.com", symbol: "BNB" },
+      polygon: { name: "Polygon", explorer: "https://api.polygonscan.com", symbol: "MATIC" },
+      arbitrum: { name: "Arbitrum", explorer: "https://api.arbiscan.io", symbol: "ETH" },
+      optimism: { name: "Optimism", explorer: "https://api-optimistic.etherscan.io", symbol: "ETH" },
+      avalanche: { name: "Avalanche", explorer: "https://api.snowtrace.io", symbol: "AVAX" },
+      base: { name: "Base", explorer: "https://api.basescan.org", symbol: "ETH" },
+    };
 
-    async function fetchAllChains() {
-      const wallet = document.getElementById("wallet").value.trim();
-      const results = document.getElementById("results");
-      results.innerHTML = "⏳ Fetching tokens across all chains...";
-
-      let allTokens = [];
-
-      for (const chain of chains) {
-        const url = `https://api.covalenthq.com/v1/${chain.slug}/address/${wallet}/balances_v2/?key=${COVALENT_KEY}`;
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
-          const tokens = data.data?.items || [];
-
-          for (const token of tokens) {
-            if (token.balance === "0") continue;
-
-            const rawBalance = parseFloat(token.balance);
-            const decimals = token.contract_decimals || 18;
-            const balance = (rawBalance / Math.pow(10, decimals)).toFixed(4);
-            const logo = token.logo_url || "";
-            const name = token.contract_name || "Unknown";
-            const symbol = token.contract_ticker_symbol || "";
-            const contract = token.contract_address.toLowerCase();
-
-            let usdPrice = await getCMCPrice(symbol);
-
-            if (!usdPrice && token.quote?.rate) {
-              usdPrice = token.quote.rate;
-            }
-
-            const usdValue = usdPrice ? (balance * usdPrice).toFixed(2) : "N/A";
-
-            allTokens.push({
-              name, symbol, balance, usdValue, logo, chain: chain.slug.replace("-mainnet", "")
-            });
-          }
-        } catch (err) {
-          console.error(`Error fetching ${chain.slug}:`, err);
-        }
+    async function fetchNativeBalance(chainKey, walletAddress) {
+      const chain = chains[chainKey];
+      const url = `${chain.explorer}/api?module=account&action=balance&address=${walletAddress}&apikey=${config.ETHERSCAN_API_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.status === "1") {
+        return parseFloat(data.result) / 1e18;
+      } else {
+        throw new Error(`Balance fetch failed`);
       }
+    }
 
-      results.innerHTML = `<h2>✅ Combined Token View</h2>`;
-      if (allTokens.length === 0) {
-        results.innerHTML += "No tokens found across chains.";
+    async function fetchTokenPrice(symbol) {
+      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}`;
+      const res = await fetch(url, {
+        headers: { "X-CMC_PRO_API_KEY": config.COINMARKETCAP_API_KEY },
+      });
+      const data = await res.json();
+      return data.data[symbol]?.quote?.USD?.price || 0;
+    }
+
+    async function loadWallet() {
+      const wallet = document.getElementById("walletInput").value.trim();
+      const tbody = document.querySelector("#resultsTable tbody");
+      tbody.innerHTML = "";
+
+      if (!wallet.startsWith("0x") || wallet.length !== 42) {
+        tbody.innerHTML = `<tr><td colspan="4" class="error">Invalid wallet address</td></tr>`;
         return;
       }
 
-      allTokens.forEach(token => {
-        results.innerHTML += `
-          <div class="token">
-            ${token.logo ? `<img src="${token.logo}" alt="${token.symbol}" />` : ""}
-            <strong>${token.name} (${token.symbol})</strong><br/>
-            Chain: ${token.chain}<br/>
-            Balance: ${token.balance}<br/>
-            USD Value: $${token.usdValue}
-          </div>
-        `;
-      });
-    }
+      for (const key in chains) {
+        const chain = chains[key];
+        try {
+          const balance = await fetchNativeBalance(key, wallet);
+          const price = await fetchTokenPrice(chain.symbol);
+          const usdValue = balance * price;
 
-    async function getCMCPrice(symbol) {
-      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}&convert=USD`;
-      try {
-        const res = await fetch(url, {
-          headers: { "X-CMC_PRO_API_KEY": CMC_KEY }
-        });
-        const data = await res.json();
-        return data.data?.[symbol]?.quote?.USD?.price || null;
-      } catch (err) {
-        console.error("CMC error:", err);
-        return null;
+          const row = `<tr>
+            <td>${chain.name}</td>
+            <td>${chain.symbol}</td>
+            <td>${balance.toFixed(6)}</td>
+            <td>$${usdValue.toFixed(2)}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        } catch (err) {
+          tbody.innerHTML += `<tr>
+            <td>${chain.name}</td>
+            <td colspan="3" class="error">Error: ${err.message}</td>
+          </tr>`;
+        }
       }
     }
   </script>
