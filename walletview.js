@@ -6,7 +6,7 @@ function fetchWallet() {
   }
 
   const chainId = "eth-mainnet"; // You can make this dynamic later
-  const apiKey = "YOUR_COVALENT_API_KEY"; // Replace with your actual key
+  const apiKey = "cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT"; // Replace with your actual key
   const url = `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/?key=${apiKey}`;
 
   fetch(url)
