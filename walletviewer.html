@@ -51,6 +51,7 @@
 
   <script>
     const COVALENT_KEY = "cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT";
+    const CMC_KEY = "5dfe48da-083d-4537-a46e-71d2d958c07d";
 
     const chains = [
       { slug: "eth-mainnet", platform: "ethereum" },
@@ -87,10 +88,8 @@
             const symbol = token.contract_ticker_symbol || "";
             const contract = token.contract_address.toLowerCase();
 
-            // Try CoinGecko first
-            let usdPrice = await getUSDPrice(contract, chain.platform);
+            let usdPrice = await getCMCPrice(symbol);
 
-            // Fallback to Covalent quote.rate
             if (!usdPrice && token.quote?.rate) {
               usdPrice = token.quote.rate;
             }
@@ -125,14 +124,16 @@
       });
     }
 
-    async function getUSDPrice(contract, platform) {
-      const url = `https://api.coingecko.com/api/v3/simple/token_price/${platform}?contract_addresses=${contract}&vs_currencies=usd`;
+    async function getCMCPrice(symbol) {
+      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}&convert=USD`;
       try {
-        const res = await fetch(url);
+        const res = await fetch(url, {
+          headers: { "X-CMC_PRO_API_KEY": CMC_KEY }
+        });
         const data = await res.json();
-        return data[contract]?.usd || null;
+        return data.data?.[symbol]?.quote?.USD?.price || null;
       } catch (err) {
-        console.error("CoinGecko error:", err);
+        console.error("CMC error:", err);
         return null;
       }
     }
