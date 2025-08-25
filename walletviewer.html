@@ -54,13 +54,10 @@
   </table>
 
   <script>
-    const config = {
-      ETHERSCAN_API_KEY: "U5HET6R6EIMUIVEJ2KNP1M3MFZC8R8JRAQ",
-      COINMARKETCAP_API_KEY: "5dfe48da-083d-4537-a46e-71d2d958c07d",
-    };
+    const ETHERSCAN_API_KEY = "U5HET6R6EIMUIVEJ2KNP1M3MFZC8R8JRAQ";
 
     async function fetchEthereumBalance(walletAddress) {
-      const url = `https://api.etherscan.io/api?module=account&action=balance&address=${walletAddress}&apikey=${config.ETHERSCAN_API_KEY}`;
+      const url = `https://api.etherscan.io/api?module=account&action=balance&address=${walletAddress}&apikey=${ETHERSCAN_API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.status === "1") {
@@ -71,12 +68,10 @@
     }
 
     async function fetchETHPrice() {
-      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=ETH`;
-      const res = await fetch(url, {
-        headers: { "X-CMC_PRO_API_KEY": config.COINMARKETCAP_API_KEY },
-      });
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd`;
+      const res = await fetch(url);
       const data = await res.json();
-      return data.data.ETH?.quote?.USD?.price || 0;
+      return data.ethereum?.usd || 0;
     }
 
     async function loadEthereum() {
