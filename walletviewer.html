@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wallet Viewer</title>
+  <title>Ethereum Wallet Viewer</title>
   <style>
     body {
       background-color: #121212;
@@ -40,14 +40,13 @@
   </style>
 </head>
 <body>
-  <h1>🧬 Multi-Chain Wallet Viewer</h1>
-  <input type="text" id="walletInput" placeholder="Enter wallet address" />
-  <button onclick="loadWallet()">Check Balances</button>
+  <h1>🧬 Ethereum Wallet Viewer</h1>
+  <input type="text" id="walletInput" placeholder="Enter Ethereum wallet address" />
+  <button onclick="loadEthereum()">Check Balance</button>
   <table id="resultsTable">
     <thead>
       <tr>
-        <th>Chain</th>
-        <th>Balance</th>
+        <th>Balance (ETH)</th>
         <th>USD Value</th>
       </tr>
     </thead>
@@ -56,70 +55,51 @@
 
   <script>
     const config = {
-      COINMARKETCAP_API_KEY: "5dfe48da-083d-4537-a46e-71d2d958c07d",
       ETHERSCAN_API_KEY: "U5HET6R6EIMUIVEJ2KNP1M3MFZC8R8JRAQ",
+      COINMARKETCAP_API_KEY: "5dfe48da-083d-4537-a46e-71d2d958c07d",
     };
 
-    const chains = {
-      ethereum: { name: "Ethereum", explorer: "https://api.etherscan.io", symbol: "ETH" },
-      bsc: { name: "BNB Chain", explorer: "https://api.bscscan.com", symbol: "BNB" },
-      polygon: { name: "Polygon", explorer: "https://api.polygonscan.com", symbol: "MATIC" },
-      arbitrum: { name: "Arbitrum", explorer: "https://api.arbiscan.io", symbol: "ETH" },
-      optimism: { name: "Optimism", explorer: "https://api-optimistic.etherscan.io", symbol: "ETH" },
-      avalanche: { name: "Avalanche", explorer: "https://api.snowtrace.io", symbol: "AVAX" },
-      base: { name: "Base", explorer: "https://api.basescan.org", symbol: "ETH" },
-    };
-
-    async function fetchNativeBalance(chainKey, walletAddress) {
-      const chain = chains[chainKey];
-      const url = `${chain.explorer}/api?module=account&action=balance&address=${walletAddress}&apikey=${config.ETHERSCAN_API_KEY}`;
+    async function fetchEthereumBalance(walletAddress) {
+      const url = `https://api.etherscan.io/api?module=account&action=balance&address=${walletAddress}&apikey=${config.ETHERSCAN_API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.status === "1") {
         return parseFloat(data.result) / 1e18;
       } else {
-        throw new Error(`Balance fetch failed`);
+        throw new Error(data.message || "Balance fetch failed");
       }
     }
 
-    async function fetchTokenPrice(symbol) {
-      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}`;
+    async function fetchETHPrice() {
+      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=ETH`;
       const res = await fetch(url, {
         headers: { "X-CMC_PRO_API_KEY": config.COINMARKETCAP_API_KEY },
       });
       const data = await res.json();
-      return data.data[symbol]?.quote?.USD?.price || 0;
+      return data.data.ETH?.quote?.USD?.price || 0;
     }
 
-    async function loadWallet() {
+    async function loadEthereum() {
       const wallet = document.getElementById("walletInput").value.trim();
       const tbody = document.querySelector("#resultsTable tbody");
       tbody.innerHTML = "";
 
       if (!wallet.startsWith("0x") || wallet.length !== 42) {
-        tbody.innerHTML = `<tr><td colspan="3" class="error">Invalid wallet address</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="2" class="error">Invalid Ethereum address</td></tr>`;
         return;
       }
 
-      for (const key in chains) {
-        const chain = chains[key];
-        try {
-          const balance = await fetchNativeBalance(key, wallet);
-          const price = await fetchTokenPrice(chain.symbol);
-          const usdValue = balance * price;
+      try {
+        const balance = await fetchEthereumBalance(wallet);
+        const price = await fetchETHPrice();
+        const usdValue = balance * price;
 
-          const row = `<tr>
-            <td>${chain.name}</td>
-            <td>${balance.toFixed(6)}</td>
-            <td>$${usdValue.toFixed(2)}</td>
-          </tr>`;
-          tbody.innerHTML += row;
-        } catch (err) {
-          tbody.innerHTML += `<tr>
-            <td>${chain.name}</td>
-            <td colspan="2" class="error">Error: ${err.message}</td>
-          </tr>`;
-        }
+        tbody.innerHTML = `<tr>
+          <td>${balance.toFixed(6)}</td>
+          <td>$${usdValue.toFixed(2)}</td>
+        </tr>`;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="2" class="error">Error: ${err.message}</td></tr>`;
       }
     }
   </script>
