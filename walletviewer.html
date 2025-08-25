@@ -5,19 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Multi-Chain Wallet Viewer</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #eee; padding: 2rem; }
-    input, select { padding: 0.5rem; margin-right: 1rem; }
-    .token { margin: 1rem 0; padding: 1rem; background: #222; border-radius: 8px; }
-    .token img { width: 24px; vertical-align: middle; margin-right: 8px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #eee;
+      padding: 2rem;
+    }
+    h1 {
+      color: #0ff;
+      text-shadow: 0 0 8px #0ff;
+    }
+    input, select, button {
+      padding: 0.6rem;
+      margin: 0.5rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background: #0ff;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+    }
+    .token {
+      background: #1a1a1a;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 6px #333;
+    }
+    .token img {
+      width: 28px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>🔍 Wallet Token Viewer</h1>
+  <h1>🧠 Multi-Chain Wallet Viewer</h1>
   <input type="text" id="wallet" placeholder="Enter wallet address" />
   <select id="chain">
     <option value="eth-mainnet">Ethereum</option>
     <option value="matic-mainnet">Polygon</option>
     <option value="bsc-mainnet">BNB Chain</option>
+    <option value="base-mainnet">Base</option>
+    <option value="avalanche-mainnet">Avalanche</option>
+    <option value="optimism-mainnet">Optimism</option>
+    <option value="arbitrum-mainnet">Arbitrum</option>
   </select>
   <button onclick="fetchTokens()">Check Tokens</button>
 
@@ -30,7 +65,7 @@
       const wallet = document.getElementById("wallet").value.trim();
       const chain = document.getElementById("chain").value;
       const results = document.getElementById("results");
-      results.innerHTML = "⏳ Loading...";
+      results.innerHTML = "⏳ Fetching tokens...";
 
       const url = `https://api.covalenthq.com/v1/${chain}/address/${wallet}/balances_v2/?key=${API_KEY}`;
 
@@ -39,11 +74,11 @@
         const data = await res.json();
 
         if (!data.data || !data.data.items) {
-          results.innerHTML = "❌ No data found.";
+          results.innerHTML = "❌ No token data found.";
           return;
         }
 
-        results.innerHTML = `<h2>✅ Tokens for ${wallet}</h2>`;
+        results.innerHTML = `<h2>✅ Tokens on ${chain.replace('-mainnet', '')}</h2>`;
         data.data.items.forEach(token => {
           if (token.balance === "0") return;
 
