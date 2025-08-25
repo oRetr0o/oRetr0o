@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multi-Chain Wallet Viewer</title>
+  <title>Unified Wallet Viewer</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -15,7 +15,7 @@
       color: #0ff;
       text-shadow: 0 0 8px #0ff;
     }
-    input, select, button {
+    input, button {
       padding: 0.6rem;
       margin: 0.5rem;
       border-radius: 6px;
@@ -43,94 +43,94 @@
   </style>
 </head>
 <body>
-  <h1>🧠 Multi-Chain Wallet Viewer</h1>
+  <h1>🌐 Unified Multi-Chain Wallet Viewer</h1>
   <input type="text" id="wallet" placeholder="Enter wallet address" />
-  <select id="chain">
-    <option value="eth-mainnet">Ethereum</option>
-    <option value="matic-mainnet">Polygon</option>
-    <option value="bsc-mainnet">BNB Chain</option>
-    <option value="base-mainnet">Base</option>
-    <option value="avalanche-mainnet">Avalanche</option>
-    <option value="optimism-mainnet">Optimism</option>
-    <option value="arbitrum-mainnet">Arbitrum</option>
-  </select>
-  <button onclick="fetchTokens()">Check Tokens</button>
+  <button onclick="fetchAllChains()">Show All Chains</button>
 
   <div id="results"></div>
 
   <script>
     const COVALENT_KEY = "cqt_rQMm9GR8VbCtb79dTtq9Pb7fT9dT";
 
-    async function fetchTokens() {
+    const chains = [
+      { slug: "eth-mainnet", platform: "ethereum" },
+      { slug: "matic-mainnet", platform: "polygon-pos" },
+      { slug: "bsc-mainnet", platform: "binance-smart-chain" },
+      { slug: "base-mainnet", platform: "base" },
+      { slug: "avalanche-mainnet", platform: "avalanche" },
+      { slug: "optimism-mainnet", platform: "optimism" },
+      { slug: "arbitrum-mainnet", platform: "arbitrum-one" }
+    ];
+
+    async function fetchAllChains() {
       const wallet = document.getElementById("wallet").value.trim();
-      const chain = document.getElementById("chain").value;
       const results = document.getElementById("results");
-      results.innerHTML = "⏳ Fetching tokens...";
+      results.innerHTML = "⏳ Fetching tokens across all chains...";
 
-      const url = `https://api.covalenthq.com/v1/${chain}/address/${wallet}/balances_v2/?key=${COVALENT_KEY}`;
+      let allTokens = [];
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
+      for (const chain of chains) {
+        const url = `https://api.covalenthq.com/v1/${chain.slug}/address/${wallet}/balances_v2/?key=${COVALENT_KEY}`;
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          const tokens = data.data?.items || [];
 
-        if (!data.data || !data.data.items) {
-          results.innerHTML = "❌ No token data found.";
-          return;
+          for (const token of tokens) {
+            if (token.balance === "0") continue;
+
+            const rawBalance = parseFloat(token.balance);
+            const decimals = token.contract_decimals || 18;
+            const balance = (rawBalance / Math.pow(10, decimals)).toFixed(4);
+            const logo = token.logo_url || "";
+            const name = token.contract_name || "Unknown";
+            const symbol = token.contract_ticker_symbol || "";
+            const contract = token.contract_address.toLowerCase();
+
+            // Try CoinGecko first
+            let usdPrice = await getUSDPrice(contract, chain.platform);
+
+            // Fallback to Covalent quote.rate
+            if (!usdPrice && token.quote?.rate) {
+              usdPrice = token.quote.rate;
+            }
+
+            const usdValue = usdPrice ? (balance * usdPrice).toFixed(2) : "N/A";
+
+            allTokens.push({
+              name, symbol, balance, usdValue, logo, chain: chain.slug.replace("-mainnet", "")
+            });
+          }
+        } catch (err) {
+          console.error(`Error fetching ${chain.slug}:`, err);
         }
-
-        results.innerHTML = `<h2>✅ Tokens on ${chain.replace('-mainnet', '')}</h2>`;
-
-        for (const token of data.data.items) {
-          if (token.balance === "0") continue;
-
-          const rawBalance = parseFloat(token.balance);
-          const decimals = token.contract_decimals || 18;
-          const balance = (rawBalance / Math.pow(10, decimals)).toFixed(4);
-          const logo = token.logo_url || "";
-          const name = token.contract_name || "Unknown";
-          const symbol = token.contract_ticker_symbol || "";
-          const contract = token.contract_address;
-
-          // Fetch USD price from CoinGecko
-          const price = await getUSDPrice(contract, chain);
-          const usdValue = price ? (balance * price).toFixed(2) : "N/A";
-
-          results.innerHTML += `
-            <div class="token">
-              ${logo ? `<img src="${logo}" alt="${symbol}" />` : ""}
-              <strong>${name} (${symbol})</strong><br/>
-              Balance: ${balance}<br/>
-              USD Value: $${usdValue}
-            </div>
-          `;
-        }
-      } catch (err) {
-        results.innerHTML = "⚠️ Error fetching token data.";
-        console.error(err);
       }
+
+      results.innerHTML = `<h2>✅ Combined Token View</h2>`;
+      if (allTokens.length === 0) {
+        results.innerHTML += "No tokens found across chains.";
+        return;
+      }
+
+      allTokens.forEach(token => {
+        results.innerHTML += `
+          <div class="token">
+            ${token.logo ? `<img src="${token.logo}" alt="${token.symbol}" />` : ""}
+            <strong>${token.name} (${token.symbol})</strong><br/>
+            Chain: ${token.chain}<br/>
+            Balance: ${token.balance}<br/>
+            USD Value: $${token.usdValue}
+          </div>
+        `;
+      });
     }
 
-    async function getUSDPrice(contract, chain) {
-      const platformMap = {
-        "eth-mainnet": "ethereum",
-        "matic-mainnet": "polygon-pos",
-        "bsc-mainnet": "binance-smart-chain",
-        "base-mainnet": "base",
-        "avalanche-mainnet": "avalanche",
-        "optimism-mainnet": "optimism",
-        "arbitrum-mainnet": "arbitrum-one"
-      };
-
-      const platform = platformMap[chain];
-      if (!platform) return null;
-
+    async function getUSDPrice(contract, platform) {
       const url = `https://api.coingecko.com/api/v3/simple/token_price/${platform}?contract_addresses=${contract}&vs_currencies=usd`;
-
       try {
         const res = await fetch(url);
         const data = await res.json();
-        const price = data[contract.toLowerCase()]?.usd;
-        return price || null;
+        return data[contract]?.usd || null;
       } catch (err) {
         console.error("CoinGecko error:", err);
         return null;
